@@ -177,6 +177,19 @@ function start({ home = mkdtempSync(join(tmpdir(), 'ds-bot-memory-')), replies =
 
 const settle = () => new Promise(resolve => setTimeout(resolve, 20))
 
+// Summary text becomes visible before its asynchronous disk write finishes.
+// Observe completion without asking for another summary or assuming a disk speed.
+async function summaryIdle(call) {
+  const deadline = Date.now() + 3000
+  let view
+  do {
+    view = (await call('memory-view', { botId: 'b2' })).value
+    if (!view.summarizing) return view
+    await settle()
+  } while (Date.now() < deadline)
+  assert.fail(`Memory summary did not become idle: ${JSON.stringify(view)}`)
+}
+
 test('remember saves one entry with its source, and forget removes it, both in the journal', async (t) => {
   const { tool, read, journal, stop } = start()
   t.after(() => stop())
@@ -336,8 +349,7 @@ test('the memory panel shows every entry and a summary the Bot\'s model writes o
   const asked = (await call('memory-view', { botId: 'b2', summarize: true })).value
   assert.deepEqual(asked.entries.map(entry => [entry.scope, entry.topic, entry.text]), [['own', null, 'Likes tea']])
   assert.equal(asked.summarizing, true)
-  await settle()
-  const done = (await call('memory-view', { botId: 'b2', summarize: true })).value
+  const done = await summaryIdle(call)
   assert.deepEqual([done.summary.text, done.fresh, done.summarizing, done.error], ['## Overview\nYou like tea.', true, false, null])
   assert.equal(requests.length, 1)
   assert.deepEqual([requests[0].provider, requests[0].model, requests[0].reasoningEffort], ['deepseek', 'v4', 'off'])
@@ -347,14 +359,12 @@ test('the memory panel shows every entry and a summary the Bot\'s model writes o
   await tool('remember', { text: 'Lives in Hangzhou' }, 'b2')
   replies.push(new Error('provider down'))
   assert.equal((await call('memory-view', { botId: 'b2', summarize: true })).value.fresh, false)
-  await settle()
-  const failed = (await call('memory-view', { botId: 'b2', summarize: true })).value
+  const failed = await summaryIdle(call)
   assert.deepEqual([failed.summary.text, failed.fresh, failed.error], ['## Overview\nYou like tea.', false, 'provider down'])
   assert.equal(requests.length, 2)
   replies.push('## Overview\nYou like tea and live in Hangzhou.')
   await call('memory-view', { botId: 'b2', regenerate: true })
-  await settle()
-  assert.equal((await call('memory-view', { botId: 'b2' })).value.summary.text, '## Overview\nYou like tea and live in Hangzhou.')
+  assert.equal((await summaryIdle(call)).summary.text, '## Overview\nYou like tea and live in Hangzhou.')
   assert.equal((await call('memory-view', { botId: 'nope' })).error.message, 'Unknown Bot')
 })
 
