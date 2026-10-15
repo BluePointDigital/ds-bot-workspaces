@@ -82,6 +82,8 @@ if (!root) {
 }
 const jsonOut = args.includes('--json') ? args[args.indexOf('--json') + 1] : null
 const showAll = args.includes('--all')
+// npm archives contain one package root rather than the source repository layout.
+const packageOnly = args.includes('--package')
 
 const findings = []
 const files = walk(root).map(path => relative(root, path).split('\\').join('/')).sort()
@@ -115,12 +117,13 @@ for (const file of files) {
 
 // Package checks: the license and the fields that npm and DSH read.
 if (!files.includes('LICENSE')) add(MUST, 'license', 'LICENSE', 0, 'no LICENSE at the root')
-if (!files.includes('ds-bot/package.json')) add(MUST, 'plugin-folder', '.', 0, 'no ds-bot/package.json')
+const pkgPrefix = packageOnly ? '' : 'ds-bot/'
+if (!files.includes(`${pkgPrefix}package.json`)) add(MUST, 'plugin-folder', '.', 0, `no ${pkgPrefix}package.json`)
 else {
-  const pkg = JSON.parse(readFileSync(join(root, 'ds-bot/package.json'), 'utf8'))
-  if (pkg.name !== 'ds-bot') add(MUST, 'package', 'ds-bot/package.json', 0, `name is "${pkg.name}", expected "ds-bot"`)
-  if (!files.includes('ds-bot/LICENSE')) add(MUST, 'package', 'ds-bot/LICENSE', 0, 'the package has no LICENSE file')
-  if (!(pkg.files ?? []).includes('LICENSE')) add(MUST, 'package', 'ds-bot/package.json', 0, '"files" does not list LICENSE')
+  const pkg = JSON.parse(readFileSync(join(root, `${pkgPrefix}package.json`), 'utf8'))
+  if (pkg.name !== 'ds-bot') add(MUST, 'package', `${pkgPrefix}package.json`, 0, `name is "${pkg.name}", expected "ds-bot"`)
+  if (!files.includes(`${pkgPrefix}LICENSE`)) add(MUST, 'package', `${pkgPrefix}LICENSE`, 0, 'the package has no LICENSE file')
+  if (!(pkg.files ?? []).includes('LICENSE')) add(MUST, 'package', `${pkgPrefix}package.json`, 0, '"files" does not list LICENSE')
   for (const field of ['repository', 'homepage', 'bugs']) {
     if (!pkg[field]) add(MUST, 'package', 'ds-bot/package.json', 0, `no "${field}" field`)
   }
@@ -128,7 +131,7 @@ else {
     if (range !== '*') add(KEEP, 'package', 'ds-bot/package.json', 0, `peer ${name} is "${range}", not "*"`)
   }
 }
-for (const name of ['README.md', 'README.zh.md', 'CONTRIBUTING.md', 'CHANGELOG.md', 'AGENTS.md', '.gitignore']) {
+for (const name of (packageOnly ? ['README.md', 'NOTICE'] : ['README.md', 'README.zh.md', 'CONTRIBUTING.md', 'CHANGELOG.md', 'AGENTS.md', '.gitignore'])) {
   if (!files.includes(name)) add(MUST, 'root-file', name, 0, 'missing at the root')
 }
 

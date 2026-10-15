@@ -1,0 +1,11 @@
+DS Bot
+Copyright 2026 Fei2411 and the DS Bot contributors
+Licensed under Apache License, Version 2.0; see LICENSE.
+
+This distribution modifies DS Bot to add the opt-in workspace bridge,
+compatibility checks, and deployment guidance. Original upstream:
+https://github.com/Fei2411/DeepSeek-Bot
+
+DeepSeek Harness runtime packages are external peer dependencies and are not
+bundled into this archive. The full source repository retains upstream NOTICE,
+contributor history, and development-script third-party notices.

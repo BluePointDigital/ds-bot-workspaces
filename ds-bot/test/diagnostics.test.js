@@ -63,7 +63,7 @@ test('warnings are kept, cleaned, written to the log, and read back after a rest
   assert.equal(second.code, 'RATE_LIMIT')
 
   const report = await rt.diagnostics.report({ client: { surface: 'Web', language: 'zh-CN', userAgent: 'Test/1' }, clientErrors: [{ time: 1, text: 'state: HTTP 502' }] })
-  assert.match(report.markdown, /\| DS Bot \| \d+\.\d+\.\d+ \|/)
+  assert.match(report.markdown, /\| DS Bot \| \d+\.\d+\.\d+(?:-[\w.]+)? \|/)
   assert.match(report.markdown, /\| Surface \| Web \|/)
   assert.match(report.markdown, /\| Models \| deepseek\/deepseek-chat \|/)
   assert.match(report.markdown, /WARN host \[EACCES\] state write failed/)
@@ -73,8 +73,14 @@ test('warnings are kept, cleaned, written to the log, and read back after a rest
   assert.equal(report.entries[0].code, 'RATE_LIMIT', 'newest first')
 
   // Written as JSON lines; a new host reads them back.
-  await new Promise(resolve => setTimeout(resolve, 50))
-  assert.equal(readFileSync(join(home, 'logs', 'diagnostics.jsonl'), 'utf8').trim().split('\n').length, 2)
+  // File writes are asynchronous; a fixed 50ms wait flakes under a full CI load.
+  let persistedLines = 0
+  const deadline = Date.now() + 3000
+  while (persistedLines !== 2 && Date.now() < deadline) {
+    try { persistedLines = readFileSync(join(home, 'logs', 'diagnostics.jsonl'), 'utf8').trim().split('\n').length } catch {}
+    if (persistedLines !== 2) await new Promise(resolve => setTimeout(resolve, 10))
+  }
+  assert.equal(persistedLines, 2)
   const again = host(home)
   assert.deepEqual((await again.diagnostics.entries()).map(entry => entry.code), ['EACCES', 'RATE_LIMIT'])
   assert.match(await again.diagnostics.logText(), /\n {4}at TestContext/)

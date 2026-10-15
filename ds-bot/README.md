@@ -1,5 +1,7 @@
 # ds-bot
 
+> **Workspace-bridge fork candidate:** follow [deployment/README.md](deployment/README.md), not the upstream npm installation below. Bridge activation is opt-in; retain `updateCheck: false`. Production compatibility for this port remains unqualified until the recorded tests and runtime pilot pass.
+
 The DS Bot plugin for [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) (dsh). It turns dsh into a team of long-lived Bots that talk to you, to each other and in group chats. See the [project page](../README.md) for an overview, install steps and screenshots.
 
 > Early release (v0.1). Features, tools and the saved data format can still change.

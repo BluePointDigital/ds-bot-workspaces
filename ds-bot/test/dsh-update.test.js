@@ -5,6 +5,7 @@ import { afterEach, test } from 'node:test'
 import { install } from '../src/host/dsh-update.js'
 
 const PKG = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8'))
+const PACKAGE_SLUG = PKG.repository.url.replace(/^git\+https:\/\/github.com\//, '').replace(/\.git$/, '')
 const flush = async () => { for (let index = 0; index < 8; index += 1) await Promise.resolve() }
 const realFetch = globalThis.fetch
 afterEach(() => { globalThis.fetch = realFetch })
@@ -51,8 +52,8 @@ function fakeChild(code) {
 
 const registryLatest = dsBot => ({ [`https://registry.npmjs.org/${PKG.name}/latest`]: { version: PKG.version, dsBot } })
 const githubLatest = (tag, manifest) => ({
-  'https://api.github.com/repos/Fei2411/DeepSeek-Bot/releases/latest': { tag_name: tag },
-  [`https://raw.githubusercontent.com/Fei2411/DeepSeek-Bot/${tag}/ds-bot/package.json`]: manifest,
+  [`https://api.github.com/repos/${PACKAGE_SLUG}/releases/latest`]: { tag_name: tag },
+  [`https://raw.githubusercontent.com/${PACKAGE_SLUG}/${tag}/ds-bot/package.json`]: manifest,
 })
 
 test('the newest released bot declares the verified DSH, offered to an older npm install', async () => {
@@ -103,8 +104,8 @@ test('a git or local install asks the public repo\'s latest release for its decl
     const view = await rt.dshUpdateCheck()
     assert.equal(view.verified, '8.8.8')
     assert.deepEqual(fetched, [
-      'https://api.github.com/repos/Fei2411/DeepSeek-Bot/releases/latest',
-      'https://raw.githubusercontent.com/Fei2411/DeepSeek-Bot/v9.0.0/ds-bot/package.json',
+      `https://api.github.com/repos/${PACKAGE_SLUG}/releases/latest`,
+      `https://raw.githubusercontent.com/${PACKAGE_SLUG}/v9.0.0/ds-bot/package.json`,
     ])
   }
 })

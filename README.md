@@ -7,6 +7,8 @@
 
 # DeepSeek Bot
 
+> **Workspace-bridge fork (release preparation).** Use [WORKSPACE-BRIDGE.md](WORKSPACE-BRIDGE.md) and its deployment kit for this fork. The original install/update instructions below refer to upstream; installing upstream `ds-bot` will not install this extension. No production qualification is claimed yet.
+
 English | [中文](README.zh.md)
 
 ![version](https://img.shields.io/badge/version-v0.1_preview-blue) ![DSH](https://img.shields.io/badge/DSH-0.2.0--rc.2-4D6BFE) ![license](https://img.shields.io/badge/license-Apache_2.0-green)

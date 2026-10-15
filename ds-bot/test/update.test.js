@@ -6,6 +6,8 @@ import { afterEach, test } from 'node:test'
 import { cleanVersion, install, newer, sourceOf } from '../src/host/update.js'
 
 const PKG = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8'))
+const PACKAGE_REPO = PKG.repository.url.replace(/^git\+/, '').replace(/\.git$/, '')
+const PACKAGE_API = PACKAGE_REPO.replace('https://github.com/', 'https://api.github.com/repos/')
 const flush = async () => { for (let index = 0; index < 8; index += 1) await Promise.resolve() }
 const realFetch = globalThis.fetch
 afterEach(() => { globalThis.fetch = realFetch })
@@ -78,7 +80,7 @@ test('a registry install finds the newest version on the next registry and insta
   assert.equal(view.latest, '9.0.0')
   assert.equal(view.current, PKG.version)
   assert.equal(view.source, 'registry')
-  assert.equal(view.notesUrl, 'https://github.com/Fei2411/DeepSeek-Bot/releases')
+  assert.equal(view.notesUrl, `${PACKAGE_REPO}/releases`)
   assert.equal(rt.updateStart().phase, 'installing')
   await flush()
   assert.deepEqual(installs, [[`${PKG.name}@9.0.0`, { registry: 'https://registry.npmmirror.com/' }]])
@@ -148,10 +150,10 @@ test('a linked checkout, an unversioned git install, or a disabled check never a
 })
 
 test('the star count comes from the repository, is kept for an hour, and survives a failed answer', async () => {
-  const repo = 'https://api.github.com/repos/Fei2411/DeepSeek-Bot'
+  const repo = PACKAGE_API
   const answers = { [repo]: new Error('offline') }
   const { rt, fetched } = start({ source: `${PKG.name}@^${PKG.version}`, answers })
-  assert.equal(rt.updateView().repoUrl, 'https://github.com/Fei2411/DeepSeek-Bot')
+  assert.equal(rt.updateView().repoUrl, PACKAGE_REPO)
   assert.equal(await rt.repoStars(), null)
   answers[repo] = { stargazers_count: 42 }
   assert.equal(await rt.repoStars(), 42)

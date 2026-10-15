@@ -61,6 +61,8 @@ export const TEAM_TOOLS = [
   'read_group_chat', 'remember', 'forget', 'recall', 'read_browser',
   'list_capabilities', 'save_capability', 'delete_capability',
   'attach_capability', 'detach_capability',
+  'list_client_workstreams', 'open_client_workstream',
+  'assign_client_workstream', 'control_client_workstream',
 ]
 // Rounds Bots may start in one group by posting, before the user speaks there again.
 export const ROOM_BOT_ROUNDS = 3

@@ -7,6 +7,8 @@
 
 # DeepSeek Bot
 
+> **工作区桥接分支（发布准备中）。** 本分支请参阅 [WORKSPACE-BRIDGE.md](WORKSPACE-BRIDGE.md) 及部署指南。下方原安装与更新说明指向上游，安装上游 `ds-bot` 不包含此扩展。目前尚未声明生产环境验证通过。
+
 [English](README.md) | 中文
 
 ![版本](https://img.shields.io/badge/版本-v0.1_预览-blue) ![DSH](https://img.shields.io/badge/DSH-0.2.0--rc.2-4D6BFE) ![许可](https://img.shields.io/badge/许可-Apache_2.0-green)

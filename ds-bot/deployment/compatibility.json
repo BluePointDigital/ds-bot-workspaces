@@ -1,0 +1,8 @@
+{
+  "bridgeVersion": 1,
+  "upstreamPluginVersion": "0.1.6",
+  "candidateDshVersions": ["0.2.0-rc.2"],
+  "qualifiedReleaseDshVersions": [],
+  "runtimeAcceptanceRequired": true,
+  "note": "The original 0.1.2 local bridge had bounded runtime checks on DSH 0.2.0-rc.2. This 0.1.6 port requires its own test and isolated runtime acceptance evidence before qualification. API shape checks alone do not qualify a version."
+}
