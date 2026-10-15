@@ -5,13 +5,66 @@
   </picture>
 </p>
 
-# DeepSeek Bot
+<div align="center">
 
-> **工作区桥接分支（发布准备中）。** 本分支请参阅 [WORKSPACE-BRIDGE.md](WORKSPACE-BRIDGE.md) 及部署指南。下方原安装与更新说明指向上游，安装上游 `ds-bot` 不包含此扩展。目前尚未声明生产环境验证通过。
+# DS Bot Workspaces
+
+### 在 Bot 聊天中协调，在正确的工作区执行，独立验证结果。
+
+**基于 [DeepSeek Bot](https://github.com/Fei2411/DeepSeek-Bot) 的工作区执行分支，使用 DeepSeek Harness 插件机制，无需分叉 Harness。**
+
+[![预发布](https://img.shields.io/badge/release-0.1.6--workspaces.1-2563eb)](https://github.com/BluePointDigital/ds-bot-workspaces/releases/tag/v0.1.6-workspaces.1)
+[![CI](https://github.com/BluePointDigital/ds-bot-workspaces/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/BluePointDigital/ds-bot-workspaces/actions/workflows/test.yml?query=branch%3Amain)
+[![许可](https://img.shields.io/badge/license-Apache_2.0-green)](LICENSE)
+
+**[下载预发布包](https://github.com/BluePointDigital/ds-bot-workspaces/releases/tag/v0.1.6-workspaces.1)** · **[部署指南](ds-bot/deployment/README.md)** · **[架构与差异](WORKSPACE-BRIDGE.md)** · **[验证范围与限制](ds-bot/deployment/VERIFICATION.md)**
 
 [English](README.md) | 中文
 
-![版本](https://img.shields.io/badge/版本-v0.1_预览-blue) ![DSH](https://img.shields.io/badge/DSH-0.2.0--rc.2-4D6BFE) ![许可](https://img.shields.io/badge/许可-Apache_2.0-green)
+</div>
+
+> [!IMPORTANT]
+> **本分支改变的是委派工作的执行位置。** 长期运行的 Bot 负责协调和汇报；有明确边界的任务在已注册项目工作区的普通持久聊天中执行，证据可检查，执行结果返回所属 Bot。
+
+## 与上游有什么不同？
+
+| 方面 | 上游 DS Bot 基础 | 本分支增加的能力 |
+|---|---|---|
+| **执行上下文** | 长期 Bot 和群聊 | 精确对应现有工作区的稳定执行聊天，使用项目实际工作目录 |
+| **任务委派** | Bot 消息和群内交接 | 范围与权限类别固定的任务，继承所属 Bot 当前角色、模型和权限，并标明真实委派者 |
+| **可追溯性** | 持久 Bot 对话 | 持久任务键、对应执行结果和回调；重复任务键不会重发 |
+| **停止与恢复** | DSH 会话和工具机制 | 暂停新派发、停止时保留收件箱、中断任务标记不确定且不自动重放 |
+| **独立审查** | 可自定义 Bot 角色 | 生产与 Verifier 使用独立工作流；执行完成不等于 QA 或客户验收 |
+| **可重复部署** | 上游插件安装 | 固定版本 GitHub 包与校验和、显式启用、配置保留助手、验收试点和回滚指南 |
+
+```mermaid
+flowchart LR
+    A["所属 Bot 聊天<br/>协调与汇报"] -->|有明确边界的任务| B["已注册项目工作区<br/>普通执行聊天"]
+    B -->|结果与证据| A
+    A -->|独立 QA 任务| C["同一项目工作区<br/>独立 Verifier 聊天"]
+    C -->|验证结果| A
+```
+
+### 四个新工作区工具
+
+`list_client_workstreams` → `open_client_workstream` → `assign_client_workstream` → `control_client_workstream`
+
+打开工作流**不会**自动派发任务。范围和权限类别保持固定；承诺的审查阶段不会默默变成发布许可。
+
+### 安装本分支，而不是上游 npm 包
+
+1. 从[预发布页面](https://github.com/BluePointDigital/ds-bot-workspaces/releases/tag/v0.1.6-workspaces.1)下载 **`ds-bot-0.1.6-workspaces.1.tgz`** 和 **`SHA256SUMS`**，先验证校验和。
+2. 按[部署指南](ds-bot/deployment/README.md)在指定配置档中替换 `ds-bot`，保留现有配置、Bot 身份、权限、计划任务和待处理工作。
+3. 显式设置 `workspaceBridge: true`，并用 `updateCheck: false` 关闭上游更新提示。首次启用时暂停新派发；完成隔离验收试点后再明确启用派发。
+
+> [!WARNING]
+> **仅供分阶段评估的预发布，并非普遍生产认证。** 执行防护限制工作线程中的 DS Bot 编排工具，**不是**通用 shell、文件系统、API 沙箱或租户隔离。不会自动迁移计划任务、复制凭据或状态、重放积压任务。每个部署均需独立验收，详见[验证说明](ds-bot/deployment/VERIFICATION.md)。
+
+---
+
+## 上游 DS Bot 概览
+
+下方保留原项目介绍、截图和安装说明，供署名与参考。**上游 `ds-bot` npm 包不包含本分支的工作区桥接扩展。**
 
 DeepSeek Bot（简称 DS Bot）是一个基于 [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness)（简称 dsh）的 bot 插件，插件将 dsh 改造为 bot 形式。你可以与自己创建的 bot 交流、工作。
 

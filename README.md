@@ -5,13 +5,66 @@
   </picture>
 </p>
 
-# DeepSeek Bot
+<div align="center">
 
-> **Workspace-bridge fork (release preparation).** Use [WORKSPACE-BRIDGE.md](WORKSPACE-BRIDGE.md) and its deployment kit for this fork. The original install/update instructions below refer to upstream; installing upstream `ds-bot` will not install this extension. No production qualification is claimed yet.
+# DS Bot Workspaces
+
+### Coordinate in Bot chats. Execute in the right workspace. Verify separately.
+
+**A workspace-execution fork of [DeepSeek Bot](https://github.com/Fei2411/DeepSeek-Bot), built on DeepSeek Harness—not a fork of the harness.**
+
+[![Prerelease](https://img.shields.io/badge/release-0.1.6--workspaces.1-2563eb)](https://github.com/BluePointDigital/ds-bot-workspaces/releases/tag/v0.1.6-workspaces.1)
+[![CI](https://github.com/BluePointDigital/ds-bot-workspaces/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/BluePointDigital/ds-bot-workspaces/actions/workflows/test.yml?query=branch%3Amain)
+[![License](https://img.shields.io/badge/license-Apache_2.0-green)](LICENSE)
+
+**[Download prerelease](https://github.com/BluePointDigital/ds-bot-workspaces/releases/tag/v0.1.6-workspaces.1)** · **[Deployment guide](ds-bot/deployment/README.md)** · **[Architecture & changes](WORKSPACE-BRIDGE.md)** · **[Verification & limits](ds-bot/deployment/VERIFICATION.md)**
 
 English | [中文](README.zh.md)
 
-![version](https://img.shields.io/badge/version-v0.1_preview-blue) ![DSH](https://img.shields.io/badge/DSH-0.2.0--rc.2-4D6BFE) ![license](https://img.shields.io/badge/license-Apache_2.0-green)
+</div>
+
+> [!IMPORTANT]
+> **This fork changes where delegated work runs.** Your long-lived Bots remain the coordination and reporting surface. Bounded assignments execute in ordinary, persistent chats inside the exact registered project workspace, with inspectable evidence and outcomes returned to the owning Bot.
+
+## What is different about this fork?
+
+| Area | Upstream DS Bot foundation | What this fork adds |
+|---|---|---|
+| **Execution context** | Long-lived Bots and group conversations | Stable execution chats in exact existing workspaces, with the actual project working directory |
+| **Delegation** | Bot-to-Bot messaging and group handoffs | Bounded assignments with immutable scope/authority, current owner role/model/permissions, and real delegating-Bot attribution |
+| **Traceability** | Persistent Bot conversations | Durable assignment keys, matching execution outcomes and owner callbacks; repeating a key does not resend work |
+| **Stop & recovery** | DSH's session and tool infrastructure | New-dispatch pause, stop with retained inbox, uncertain interrupted work and no automatic replay |
+| **Independent review** | Customizable Bot roles | Separate producer and Verifier workstreams; execution completion is not QA or client acceptance |
+| **Repeatable setup** | Upstream plugin installation | Pinned GitHub release assets and checksums, opt-in configuration, preservation helpers, acceptance pilot and rollback guidance |
+
+```mermaid
+flowchart LR
+    A["Owning Bot chat<br/>Coordinate & report"] -->|Bounded assignment| B["Registered project workspace<br/>Ordinary execution chat"]
+    B -->|Outcome & evidence| A
+    A -->|Separate QA assignment| C["Same project workspace<br/>Independent Verifier chat"]
+    C -->|Verification result| A
+```
+
+### Four new workspace tools
+
+`list_client_workstreams` → `open_client_workstream` → `assign_client_workstream` → `control_client_workstream`
+
+Opening a stream does **not** dispatch work. Scope and authority stay fixed; a promised review never silently becomes publication permission.
+
+### Install this fork—not the upstream npm package
+
+1. Download **`ds-bot-0.1.6-workspaces.1.tgz`** and **`SHA256SUMS`** from the [prerelease](https://github.com/BluePointDigital/ds-bot-workspaces/releases/tag/v0.1.6-workspaces.1), then verify the checksum.
+2. Follow the [deployment guide](ds-bot/deployment/README.md) to replace `ds-bot` in the selected profile, preserving existing configuration, Bot identities, permissions, schedules and pending work.
+3. Explicitly enable `workspaceBridge: true` and disable upstream update offers with `updateCheck: false`. First activation pauses new dispatch; run the isolated acceptance pilot before deliberately enabling it.
+
+> [!WARNING]
+> **Staged-evaluation prerelease—not blanket production qualification.** The guard blocks DS Bot orchestration tools inside workers; it is **not** a universal shell/filesystem/API sandbox or tenant-isolation boundary. No automatic schedule migration, credential/state copying or backlog replay. Each deployment needs its own acceptance check. See [verification details](ds-bot/deployment/VERIFICATION.md).
+
+---
+
+## Upstream DS Bot overview
+
+The original project's overview, screenshots and installation instructions are retained below for attribution and reference. **The upstream `ds-bot` npm package does not include this fork's workspace bridge.**
 
 DeepSeek Bot (DS Bot) is a bot plugin for [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) (DSH). It turns DSH into bots. You create your own bots, then talk and work with them.
 

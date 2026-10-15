@@ -1,10 +1,10 @@
-# Workspace bridge fork — release preparation
+# Workspace bridge fork — staged-evaluation prerelease
 
 This fork adds persistent, inspectable ordinary-workspace execution to DS Bot. Bot chats coordinate; workspace workers execute; outcomes return to the owning Bot. Producer and Verifier sessions stay separate.
 
 The source is based on upstream DS Bot 0.1.6. Bridge code is opt-in (`workspaceBridge: true`), with new dispatch initially paused. This is a **release candidate**, not yet a qualified production release. No DSH fork, client-data migration, credential copying or schedule migration is required.
 
-Start with the [deployment kit](ds-bot/deployment/README.md), [generic operating policy](ds-bot/deployment/OPERATING-POLICY.md), and [compatibility declaration](ds-bot/deployment/compatibility.json). Release artifacts will be attached to this fork's GitHub releases, not published to upstream's npm package. Package metadata is private to prevent accidental npm publication. Keep update checks disabled on managed installations until the fork's verified upgrade policy is satisfied.
+Start with the [deployment kit](ds-bot/deployment/README.md), [generic operating policy](ds-bot/deployment/OPERATING-POLICY.md), and [compatibility declaration](ds-bot/deployment/compatibility.json). The [0.1.6-workspaces.1 prerelease](https://github.com/BluePointDigital/ds-bot-workspaces/releases/tag/v0.1.6-workspaces.1) includes the plugin archive and SHA256SUMS, not an upstream npm publication. Package metadata is private to prevent accidental npm publication. Keep update checks disabled on managed installations until the fork's verified upgrade policy is satisfied.
 
 ## Development
 
@@ -32,4 +32,4 @@ The bridge core uses injected adapters for deterministic unit tests. Compatibili
 
 Original bridge source was developed as a local plugin extension; this repository port contains only reusable implementation and synthetic tests. No client briefs, credentials, private histories, production state or instance-specific workspace IDs belong in commits or release assets. Preserve upstream license/notice and contributor history.
 
-Maintained repository: https://github.com/BluePointDigital/ds-bot-workspaces (private). Derived from https://github.com/Fei2411/DeepSeek-Bot with upstream contributor history and licensing preserved. Candidate artifacts are distributed through this repository's GitHub prereleases, never upstream npm. Consult the exact tag's CI and deployment verification notes before staging.
+Maintained public repository: https://github.com/BluePointDigital/ds-bot-workspaces . Derived from https://github.com/Fei2411/DeepSeek-Bot with upstream contributor history and licensing preserved. Candidate artifacts are distributed through this repository's GitHub prereleases, never upstream npm. Consult the exact tag's CI and deployment verification notes before staging.
